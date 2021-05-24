@@ -1,0 +1,12 @@
+// .canvas {
+//   width: 500px;
+//   height: 500px;
+// }
+.alive {
+  background-color: black;
+  transition: all 0.2s ease-in-out;
+}
+.dead {
+  background-color: white;
+  transition: all 0.2s ease-in-out;
+}

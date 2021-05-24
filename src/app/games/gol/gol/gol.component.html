@@ -1,0 +1,10 @@
+
+<button (click)="startGame()">Start</button>
+<button (click)="stopGame()">Stop</button>
+<h1></h1>
+<div class="grid" [ngStyle]="setGridStyle()">
+  <div *ngFor="let cell of grid">
+    <div class="cell" [ngStyle]="setCellStyle()" [ngClass]="cell.alive ? 'alive' : 'dead'" (mouseover)="clickCell(cell)">
+    </div>
+  </div>
+</div>
