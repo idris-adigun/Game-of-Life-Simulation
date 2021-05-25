@@ -16,6 +16,7 @@ export class GolComponent implements OnInit {
   column = 0;
   grid =[];
   cell = {};
+  positions = ['TOP', 'TOP_RIGHT', 'RIGHT', 'BOTTOM_RIGHT', 'BOTTOM', 'LEFT_BOTTOM', 'LEFT', 'LEFT_TOP']
 
   timerInterval;
   constructor() {
@@ -24,19 +25,19 @@ export class GolComponent implements OnInit {
 
 
    createGrid(){
-      for(let i = 0; i < this.row; i++){
-        for(let j = 0; j < this.column; j++)
-        {
-            let value = 0;
-            let cell = {
-              index: i* this.column + j,
-              alive: value == 1 ? true : false,
-              row: i,
-              col: j
-            }
-            this.grid.push(cell);
-        }
+    for(let i = 0; i < this.row; i++){
+      for(let j = 0; j < this.column; j++)
+      {
+          let value = 0;
+          let cell = {
+            index: i* this.column + j,
+            alive: value == 1 ? true : false,
+            row: i,
+            col: j
+          }
+          this.grid.push(cell);
       }
+    }
    }
 
    ngOnInit(): void {
@@ -73,37 +74,35 @@ export class GolComponent implements OnInit {
 
    activateCell(cell){
      this.grid[cell.index] = {...cell, alive: true}
-    // let nb = this.checkNeighborAlive(cell)
-    // console.log(nb)
-    // //  console.table(this.grid)
-    // //  console.log(this.grid)
    }
 
    startGame(){
     this.timerInterval = setInterval(() => {
-        this.grid.forEach((currentCell, index) => {
-          let numberOfNeigborAlive = this.checkNeighborAlive(currentCell);
-          if(currentCell.alive){
-            if(numberOfNeigborAlive < 2){
-              this.grid[index].alive = false;
-            }
-            else if(numberOfNeigborAlive === 2 || numberOfNeigborAlive === 3){
-              this.grid[index].alive = true;
-            }
-            else if(numberOfNeigborAlive > 3){
-              this.grid[index].alive = false;
-            }
-            else{
-              this.grid[index].alive = false;
-            }
+      let prevGridGeneration = JSON.parse(JSON.stringify(this.grid));
+      prevGridGeneration.forEach((currentCell, index) => {
+        let numberOfNeigborAlive = this.checkNeighborAlive(currentCell);
+        if(currentCell.alive){
+          if(numberOfNeigborAlive < 2){
+            prevGridGeneration[index].alive = false;
           }
-          else if(!currentCell.alive){
-            if(numberOfNeigborAlive === 3){
-              this.grid[index].alive = true;
-            }
+          else if(numberOfNeigborAlive === 2 || numberOfNeigborAlive === 3){
+            prevGridGeneration[index].alive = true;
           }
-      })
-     }, 1000);
+          else if(numberOfNeigborAlive > 3){
+            prevGridGeneration[index].alive = false;
+          }
+          else{
+            prevGridGeneration[index].alive = false;
+          }
+        }
+        else if(!currentCell.alive){
+          if(numberOfNeigborAlive === 3){
+            prevGridGeneration[index].alive = true;
+          }
+        }
+      });
+      this.grid = JSON.parse(JSON.stringify(prevGridGeneration));
+   }, 1000);
    }
 
    stopGame(){
@@ -111,54 +110,15 @@ export class GolComponent implements OnInit {
    }
 
    checkNeighborAlive(cell){
+      let numberOfNeigborAlive = 0;
 
-    let numberOfNeigborAlive = 0;
-
-    let leftNeighbor = this.getNeighborLeft(cell);
-    if(leftNeighbor.exist && leftNeighbor.alive){
-      numberOfNeigborAlive++;
-    }
-
-    let rightNeighbor = this.getNeighborRight(cell);
-    if(rightNeighbor.exist && rightNeighbor.alive){
-      numberOfNeigborAlive++;
-    }
-
-    let aboveNeighbor = this.getNeighborAbove(cell);
-    if(aboveNeighbor.exist && aboveNeighbor.alive){
-      numberOfNeigborAlive++;
-    }
-
-    let belowNeighbor = this.getNeighborBelow(cell);
-    if(belowNeighbor.exist && belowNeighbor.alive){
-      numberOfNeigborAlive++
-    }
-
-    let topRightNeighbor = this.getNeighborTopRight(cell);
-    if(topRightNeighbor.exist && topRightNeighbor.alive)
-    {
-      numberOfNeigborAlive++;
-    }
-
-    let topLeftNeighbor = this.getNeighborTopLeft(cell);
-    if(topLeftNeighbor.exist && topLeftNeighbor.alive)
-    {
-      numberOfNeigborAlive++;
-    }
-
-    let bottomRightNeighbor = this.getNeighborBottomRight(cell);
-    if(bottomRightNeighbor.exist && bottomRightNeighbor.alive)
-    {
-      numberOfNeigborAlive++;
-    }
-
-    let bottomLeftNeighbor = this.getNeighborBottomLeft(cell);
-    if(bottomLeftNeighbor.exist && bottomLeftNeighbor.alive)
-    {
-      numberOfNeigborAlive++
-    }
-    console.log(numberOfNeigborAlive)
-    return numberOfNeigborAlive;
+      this.positions.forEach(position => {
+        let neighbor = this.getNeighbors(cell, position)
+        if(neighbor.exist && neighbor.alive){
+          numberOfNeigborAlive++;
+        }
+      })
+      return numberOfNeigborAlive;
    }
 
    checkRowAndColumn(row, column){
@@ -169,95 +129,29 @@ export class GolComponent implements OnInit {
      return true;
    }
 
-  getNeighborAbove(cell){
-    let neighborIndex = cell.index - this.row
-    let neighborStatus = {
-      x: cell.row -1,
-      y: cell.col,
-      alive: this.checkRowAndColumn(cell.row -1, cell.col) ? this.grid[neighborIndex].alive : false,
-      exist: this.checkRowAndColumn(cell.row -1, cell.col)
-    }
-    return neighborStatus;
-  }
+   getNeighbors(cell, position){
+      let cordinates = this.getPositionCordinate(cell, position);
+      let neighborStatus = {
+        x: cordinates.x,
+        y: cordinates.y,
+        alive: this.checkRowAndColumn(cordinates.x, cordinates.y) ? this.grid[cordinates.index].alive : false,
+        exist: this.checkRowAndColumn(cordinates.x, cordinates.y)
+      }
+      return neighborStatus;
 
-  getNeighborTopRight(cell){
-    let neighborIndex = (cell.index - this.row) + 1;
-    let neighborStatus = {
-      x: cell.row -1,
-      y: cell.col + 1,
-      alive: this.checkRowAndColumn(cell.row -1, cell.col + 1) ? this.grid[neighborIndex].alive : false,
-      exist: this.checkRowAndColumn(cell.row -1, cell.col + 1)
-    }
-    return neighborStatus;
-  }
+   }
 
-  getNeighborTopLeft(cell){
-    let neighborIndex = (cell.index - this.row) - 1;
-    let neighborStatus = {
-      x: cell.row -1,
-      y: cell.col - 1,
-      alive: this.checkRowAndColumn(cell.row -1, cell.col - 1) ? this.grid[neighborIndex].alive : false,
-      exist: this.checkRowAndColumn(cell.row -1, cell.col - 1)
-    }
-    return neighborStatus;
-  }
-
-  getNeighborBottomRight(cell){
-    let neighborIndex = (cell.index + this.row) + 1;
-    let neighborStatus = {
-      x: cell.row + 1,
-      y: cell.col + 1,
-      alive: this.checkRowAndColumn(cell.row + 1, cell.col + 1) ? this.grid[neighborIndex].alive : false,
-      exist: this.checkRowAndColumn(cell.row + 1, cell.col + 1)
-    }
-    return neighborStatus;
-  }
-
-  getNeighborBottomLeft(cell){
-    let neighborIndex = (cell.index + this.row) - 1;
-    let neighborStatus = {
-      x: cell.row + 1,
-      y: cell.col - 1,
-      alive: this.checkRowAndColumn(cell.row + 1, cell.col - 1) ? this.grid[neighborIndex].alive : false,
-      exist: this.checkRowAndColumn(cell.row + 1, cell.col - 1)
-    }
-    return neighborStatus;
-  }
-
-  getNeighborBelow(cell){
-    let neighborIndex = cell.index + this.row;
-
-    let neighborStatus = {
-      x: cell.row +1,
-      y: cell.col,
-      alive: this.checkRowAndColumn(cell.row +1, cell.col) ? this.grid[neighborIndex].alive : false,
-      exist: this.checkRowAndColumn(cell.row +1, cell.col)
-    }
-    return neighborStatus;
-  }
-
-  getNeighborLeft(cell){
-    let neighborIndex = cell.index - 1;
-
-    let neighborStatus = {
-      x: cell.row,
-      y: cell.col - 1,
-      alive: this.checkRowAndColumn(cell.row, cell.col -1) ? this.grid[neighborIndex].alive : false,
-      exist: this.checkRowAndColumn(cell.row, cell.col -1)
-    }
-    return neighborStatus;
-  }
-
-  getNeighborRight(cell){
-    let neighborIndex = cell.index + 1;
-
-    let neighborStatus = {
-      x: cell.row,
-      y: cell.col - 1,
-      alive: this.checkRowAndColumn(cell.row, cell.col + 1) ? this.grid[neighborIndex].alive : false,
-      exist: this.checkRowAndColumn(cell.row, cell.col + 1)
-    }
-    return neighborStatus;
-  }
+   getPositionCordinate(cell, position){
+      let cord : any;
+      position === 'TOP' ? cord = {x: cell.row -1, y: cell.col, index: cell.index - this.row} : '';
+      position === 'TOP_RIGHT' ? cord = {x: cell.row -1, y: cell.col + 1, index: (cell.index - this.row) + 1} : '';
+      position === 'RIGHT' ? cord = {x: cell.row, y: cell.col + 1, index: cell.index + 1} : '';
+      position === 'BOTTOM_RIGHT' ? cord = {x: cell.row + 1, y: cell.col + 1, index: (cell.index + this.row) + 1} : '';
+      position === 'BOTTOM' ? cord = {x: cell.row +1, y: cell.col, index: cell.index + this.row} : '';
+      position === 'LEFT_BOTTOM' ? cord = {x: cell.row +1, y: cell.col -1, index: (cell.index + this.row) -1} : '';
+      position === 'LEFT' ? cord = {x: cell.row, y: cell.col -1, index: cell.index - 1} : '';
+      position === 'LEFT_TOP' ? cord = {x: cell.row -1, y: cell.col - 1, index: (cell.index - this.row) - 1} : '';
+      return cord;
+   }
 
 }
