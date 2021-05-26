@@ -9,9 +9,9 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 export class GolComponent implements OnInit {
   @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
   ctx: CanvasRenderingContext2D;
-  height= 500;
-  width= 500;
-  resolution = 10;
+  height= 1000;
+  width= 1000;
+  resolution = 20;
   row = 0;
   column = 0;
   grid =[];
@@ -62,7 +62,7 @@ export class GolComponent implements OnInit {
 
    setCellStyle(){
      return {
-       'border': '1px solid grey',
+       'border': '1px solid #8a8a8a96',
        'text-align': 'center',
        'width': `${this.resolution}px`,
        'height': `${this.resolution}px`
@@ -76,32 +76,40 @@ export class GolComponent implements OnInit {
      this.grid[cell.index] = {...cell, alive: true}
    }
 
+   determineCellFate(newGenerationGrid, cell, numberOfNeigborAlive, index){
+    if(cell.alive){
+      if(numberOfNeigborAlive < 2){
+        newGenerationGrid[index].alive = false;
+      }
+      else if(numberOfNeigborAlive === 2 || numberOfNeigborAlive === 3){
+        newGenerationGrid[index].alive = true;
+      }
+      else if(numberOfNeigborAlive > 3){
+        newGenerationGrid[index].alive = false;
+      }
+      else{
+        newGenerationGrid[index].alive = false;
+      }
+    }
+    else if(!newGenerationGrid[index].alive){
+      if(numberOfNeigborAlive === 3){
+        newGenerationGrid[index].alive = true;
+      }
+    }
+    return newGenerationGrid;
+   }
+
    startGame(){
     this.timerInterval = setInterval(() => {
-      let prevGridGeneration = JSON.parse(JSON.stringify(this.grid));
-      prevGridGeneration.forEach((currentCell, index) => {
-        let numberOfNeigborAlive = this.checkNeighborAlive(currentCell);
-        if(currentCell.alive){
-          if(numberOfNeigborAlive < 2){
-            prevGridGeneration[index].alive = false;
-          }
-          else if(numberOfNeigborAlive === 2 || numberOfNeigborAlive === 3){
-            prevGridGeneration[index].alive = true;
-          }
-          else if(numberOfNeigborAlive > 3){
-            prevGridGeneration[index].alive = false;
-          }
-          else{
-            prevGridGeneration[index].alive = false;
-          }
+        let newGenerationGrid = JSON.parse(JSON.stringify(this.grid));
+
+        for(let i = 0; i < newGenerationGrid.length; i++)
+        {
+            let cell = this.grid[i];
+            let numberOfNeigborAlive = this.checkNeighborAlive(cell);
+            newGenerationGrid = this.determineCellFate(newGenerationGrid, cell, numberOfNeigborAlive, i);
         }
-        else if(!currentCell.alive){
-          if(numberOfNeigborAlive === 3){
-            prevGridGeneration[index].alive = true;
-          }
-        }
-      });
-      this.grid = JSON.parse(JSON.stringify(prevGridGeneration));
+        this.grid = JSON.parse(JSON.stringify(newGenerationGrid));
    }, 1000);
    }
 
