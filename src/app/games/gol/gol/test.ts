@@ -11,7 +11,7 @@ export class GolComponent implements OnInit {
   ctx: CanvasRenderingContext2D;
   height= 1000;
   width= 1000;
-  resolution = 20;
+  resolution = 10;
   row = 0;
   column = 0;
   grid =[];
@@ -29,21 +29,10 @@ export class GolComponent implements OnInit {
     // console.log(event)
   }
 
-  drawLiveCell(x, y){
-    this.ctx.fillStyle = 'black';
-    this.ctx.fillRect(x, y, this.resolution, this.resolution);
-    this.ctx.strokeRect(x, y, this.resolution, this.resolution);
-    this.ctx.strokeStyle = 'black';
-  }
-
-  drawDeadCell(x, y){
-    this.ctx.fillStyle = 'white';
-    this.ctx.fillRect(x, y, this.resolution-1, this.resolution-1);
-    this.ctx.strokeRect(x, y, this.resolution, this.resolution);
-    this.ctx.strokeStyle = 'black';
-  }
-
    createGrid(){
+    this.row = this.width/this.resolution;
+    this.column = this.height/this.resolution;
+    this.ctx = this.canvas.nativeElement.getContext('2d');
     for(let i = 0; i < this.row; i++){
       for(let j = 0; j < this.column; j++)
       {
@@ -63,41 +52,30 @@ export class GolComponent implements OnInit {
     this.startGame();
    }
 
+   drawLiveCell(x, y){
+    this.ctx.fillRect(x, y, this.resolution-1, this.resolution-1);
+    this.ctx.fillStyle = 'black';
+    this.ctx.strokeRect(x, y, this.resolution, this.resolution);
+    this.ctx.strokeStyle = 'black';
+   }
+
+   drawDeadCell(x, y){
+    this.ctx.fillRect(x, y, this.resolution-1, this.resolution-1);
+    this.ctx.fillStyle = 'white';
+    this.ctx.strokeRect(x, y, this.resolution, this.resolution);
+    this.ctx.strokeStyle = 'black';
+   }
+
    ngOnInit(): void {
-     // this.ctx = this.canvas.nativeElement.getContext('2d');
-    this.row = this.width/this.resolution;
-    this.column = this.height/this.resolution;
-    this.ctx = this.canvas.nativeElement.getContext('2d');
     this.createGrid()
    }
 
    setCanvasStyle(){
      return{
-      //  'width': `${this.width}px`,
+       'width': `${100}%`,
       //  'height': `${this.height}px`
      }
    }
-  //  setGridStyle(){
-  //    return {
-  //      'display': 'grid',
-  //      'grid-template-columns': `repeat(${this.column}, 1fr)`,
-  //      'grid-template-row': `repeat(${this.row}, 1fr)`,
-  //      'justify-items': 'center',
-  //      'gap': '0px 0px',
-  //      'margin': "0 auto",
-  //      'width': `${this.width}px`,
-  //      'height': `${this.height}px`,
-  //    };
-  //  }
-
-  //  setCellStyle(){
-  //    return {
-  //      'border': '1px solid #8a8a8a96',
-  //      'text-align': 'center',
-  //      'width': `${this.resolution}px`,
-  //      'height': `${this.resolution}px`
-  //    }
-  //  }
 
    activateCell(cell){
      this.grid[cell.index] = {...cell, alive: true}
@@ -115,22 +93,21 @@ export class GolComponent implements OnInit {
       }
       else if(numberOfNeigborAlive === 2 || numberOfNeigborAlive === 3){
         newGenerationGrid[index].alive = true;
-        this.drawLiveCell(x, y);
+        this.drawLiveCell(x, y)
       }
       else if(numberOfNeigborAlive > 3){
         newGenerationGrid[index].alive = false;
-        this.drawDeadCell(x, y);
+        this.drawDeadCell(x, y)
       }
       else{
         newGenerationGrid[index].alive = false;
-        this.drawDeadCell(x, y);
+        this.drawDeadCell(x, y)
       }
     }
     else if(!newGenerationGrid[index].alive){
-      console.log('red')
       if(numberOfNeigborAlive === 3){
         newGenerationGrid[index].alive = true;
-        this.drawLiveCell(x, y);
+        this.drawLiveCell(x, y)
       }
     }
     return newGenerationGrid;
@@ -146,7 +123,7 @@ export class GolComponent implements OnInit {
             newGenerationGrid = this.determineCellFate(newGenerationGrid, cell, numberOfNeigborAlive, i);
         }
         this.grid = JSON.parse(JSON.stringify(newGenerationGrid));
-   }, 10);
+   }, 100);
    }
 
    stopGame(){
