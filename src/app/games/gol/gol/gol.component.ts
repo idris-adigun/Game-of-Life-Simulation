@@ -11,16 +11,15 @@ export class GolComponent implements OnInit {
   ctx: CanvasRenderingContext2D;
   height= 1000;
   width= 1000;
-  resolution = 20;
+  resolution = 10;
   row = 0;
   column = 0;
   grid =[];
   cell = {};
   positions = ['TOP', 'TOP_RIGHT', 'RIGHT', 'BOTTOM_RIGHT', 'BOTTOM', 'LEFT_BOTTOM', 'LEFT', 'LEFT_TOP']
-
   timerInterval;
-  constructor() {
 
+  constructor() {
   }
 
 
@@ -28,22 +27,30 @@ export class GolComponent implements OnInit {
     for(let i = 0; i < this.row; i++){
       for(let j = 0; j < this.column; j++)
       {
-          let value = 0;
+          let value = Math.ceil(Math.random() * 2);
           let cell = {
             index: i* this.column + j,
             alive: value == 1 ? true : false,
             row: i,
             col: j
           }
+          let x = i * this.resolution;
+          let y = j * this.resolution;
+          value == 1 ? this.ctx.fillStyle = 'black' : this.ctx.fillStyle = 'white';
+          this.ctx.strokeStyle = 'black'
+          this.ctx.strokeRect(x, y, this.resolution-1, this.resolution-1);
+          this.ctx.fillRect(x, y, this.resolution, this.resolution);
           this.grid.push(cell);
       }
     }
+    this.startGame();
    }
 
    ngOnInit(): void {
      // this.ctx = this.canvas.nativeElement.getContext('2d');
     this.row = this.width/this.resolution;
     this.column = this.height/this.resolution;
+    this.ctx = this.canvas.nativeElement.getContext('2d');
     this.createGrid()
    }
 
@@ -68,32 +75,44 @@ export class GolComponent implements OnInit {
        'height': `${this.resolution}px`
      }
    }
-   clickCell(cell){
-     this.activateCell(cell)
-   }
 
    activateCell(cell){
      this.grid[cell.index] = {...cell, alive: true}
    }
 
    determineCellFate(newGenerationGrid, cell, numberOfNeigborAlive, index){
+
+    let x = cell.row * this.resolution;
+    let y = cell.col * this.resolution;
     if(cell.alive){
+      cell = newGenerationGrid[index]
       if(numberOfNeigborAlive < 2){
         newGenerationGrid[index].alive = false;
+        this.ctx.fillStyle = 'white';
+        this.ctx.fillRect(x, y, this.resolution, this.resolution);
       }
       else if(numberOfNeigborAlive === 2 || numberOfNeigborAlive === 3){
         newGenerationGrid[index].alive = true;
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(x, y, this.resolution, this.resolution);
       }
       else if(numberOfNeigborAlive > 3){
         newGenerationGrid[index].alive = false;
+        this.ctx.fillStyle = 'white';
+        this.ctx.fillRect(x, y, this.resolution, this.resolution);
       }
       else{
         newGenerationGrid[index].alive = false;
+        this.ctx.fillStyle = 'white';
+        this.ctx.fillRect(x, y, this.resolution, this.resolution);
       }
     }
     else if(!newGenerationGrid[index].alive){
+      console.log('red')
       if(numberOfNeigborAlive === 3){
         newGenerationGrid[index].alive = true;
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(x, y, this.resolution, this.resolution);
       }
     }
     return newGenerationGrid;
@@ -102,7 +121,6 @@ export class GolComponent implements OnInit {
    startGame(){
     this.timerInterval = setInterval(() => {
         let newGenerationGrid = JSON.parse(JSON.stringify(this.grid));
-
         for(let i = 0; i < newGenerationGrid.length; i++)
         {
             let cell = this.grid[i];
@@ -110,7 +128,7 @@ export class GolComponent implements OnInit {
             newGenerationGrid = this.determineCellFate(newGenerationGrid, cell, numberOfNeigborAlive, i);
         }
         this.grid = JSON.parse(JSON.stringify(newGenerationGrid));
-   }, 1000);
+   }, 200);
    }
 
    stopGame(){
@@ -121,7 +139,7 @@ export class GolComponent implements OnInit {
       let numberOfNeigborAlive = 0;
 
       this.positions.forEach(position => {
-        let neighbor = this.getNeighbors(cell, position)
+        let neighbor = this.getNeighbor(cell, position)
         if(neighbor.exist && neighbor.alive){
           numberOfNeigborAlive++;
         }
@@ -137,7 +155,7 @@ export class GolComponent implements OnInit {
      return true;
    }
 
-   getNeighbors(cell, position){
+   getNeighbor(cell, position){
       let cordinates = this.getPositionCordinate(cell, position);
       let neighborStatus = {
         x: cordinates.x,
