@@ -1,6 +1,8 @@
 
-<button (click)="startGame()">Start</button>
-<button (click)="stopGame()">Stop</button>
+<div style="margin: 0 auto; text-align: center;">
+  <button (click)="startGame()">Start</button>
+  <button (click)="stopGame()">Stop</button>
+</div>
 <!-- <h1></h1>
 <div class="grid" [ngStyle]="setGridStyle()">
   <div *ngFor="let cell of grid">
@@ -8,4 +10,4 @@
     </div>
   </div>
 </div> -->
-<div><canvas #canvas width="1000" height="1000" (click)="getCord($event)"></canvas></div>
+<div  id="canvas-container"><canvas #canvas width="1000" height="1000" (click)="getCord($event)"></canvas></div>

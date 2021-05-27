@@ -31,19 +31,20 @@ export class GolComponent implements OnInit {
 
   drawLiveCell(x, y){
     this.ctx.fillStyle = 'black';
-    this.ctx.fillRect(x, y, this.resolution, this.resolution);
+    this.ctx.fillRect(x, y, this.resolution - 1, this.resolution -1);
     this.ctx.strokeRect(x, y, this.resolution, this.resolution);
-    this.ctx.strokeStyle = 'black';
+    this.ctx.strokeStyle = '#dadada';
   }
 
   drawDeadCell(x, y){
     this.ctx.fillStyle = 'white';
     this.ctx.fillRect(x, y, this.resolution-1, this.resolution-1);
     this.ctx.strokeRect(x, y, this.resolution, this.resolution);
-    this.ctx.strokeStyle = 'black';
+    this.ctx.strokeStyle = '#dadada';
   }
 
    createGrid(){
+
     for(let i = 0; i < this.row; i++){
       for(let j = 0; j < this.column; j++)
       {
@@ -77,27 +78,6 @@ export class GolComponent implements OnInit {
       //  'height': `${this.height}px`
      }
    }
-  //  setGridStyle(){
-  //    return {
-  //      'display': 'grid',
-  //      'grid-template-columns': `repeat(${this.column}, 1fr)`,
-  //      'grid-template-row': `repeat(${this.row}, 1fr)`,
-  //      'justify-items': 'center',
-  //      'gap': '0px 0px',
-  //      'margin': "0 auto",
-  //      'width': `${this.width}px`,
-  //      'height': `${this.height}px`,
-  //    };
-  //  }
-
-  //  setCellStyle(){
-  //    return {
-  //      'border': '1px solid #8a8a8a96',
-  //      'text-align': 'center',
-  //      'width': `${this.resolution}px`,
-  //      'height': `${this.resolution}px`
-  //    }
-  //  }
 
    activateCell(cell){
      this.grid[cell.index] = {...cell, alive: true}
@@ -109,11 +89,7 @@ export class GolComponent implements OnInit {
     let y = cell.col * this.resolution;
     if(cell.alive){
       cell = newGenerationGrid[index]
-      if(numberOfNeigborAlive < 2){
-        newGenerationGrid[index].alive = false;
-        this.drawDeadCell(x, y);
-      }
-      else if(numberOfNeigborAlive === 2 || numberOfNeigborAlive === 3){
+      if(numberOfNeigborAlive === 2 || numberOfNeigborAlive === 3){
         newGenerationGrid[index].alive = true;
         this.drawLiveCell(x, y);
       }
@@ -146,7 +122,7 @@ export class GolComponent implements OnInit {
             newGenerationGrid = this.determineCellFate(newGenerationGrid, cell, numberOfNeigborAlive, i);
         }
         this.grid = JSON.parse(JSON.stringify(newGenerationGrid));
-   }, 10);
+   }, 100);
    }
 
    stopGame(){
