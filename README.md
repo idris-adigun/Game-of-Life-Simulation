@@ -1,6 +1,6 @@
 # Games
 
-This a Game of Life Simulation project based on [Conway's Law](https://en.wikipedia.org/wiki/Conway%27s_law)
+This a Game of Life Simulation project based on [Conway's Law](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life#:~:text=Any%20live%20cell%20with%20two,cell%2C%20as%20if%20by%20reproduction.)
 
 # Demo
 [Demo](https://gol-sim.netlify.app/)
