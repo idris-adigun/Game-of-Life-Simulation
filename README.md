@@ -2,8 +2,7 @@
 
 This a Game of Life Simulation project based on [Conway's Law](https://en.wikipedia.org/wiki/Conway%27s_law)
 
-
-#Demo
+# Demo
 [Demo](https://gol-sim.netlify.app/)
 
 ## Development server
