@@ -65,6 +65,7 @@ export class GolComponent implements OnInit {
    }
 
   createGridArray(){
+    this.grid = [];
     for(let i = 0; i < this.row; i++){
       for(let j = 0; j < this.column; j++)
       {
