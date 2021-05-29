@@ -19,6 +19,7 @@ export class GolComponent implements OnInit {
   positions = ['TOP', 'TOP_RIGHT', 'RIGHT', 'BOTTOM_RIGHT', 'BOTTOM', 'LEFT_BOTTOM', 'LEFT', 'LEFT_TOP']
   timerInterval;
   simulationRunningStatus = false;
+  generationCount = 0;
   constructor() {
   }
 
@@ -27,7 +28,7 @@ export class GolComponent implements OnInit {
    this.row = this.width/this.resolution;
    this.column = this.height/this.resolution;
    this.ctx = this.canvas.nativeElement.getContext('2d');
-   this.createGridArray()
+   this.createGridArray();
   }
 
 
@@ -44,6 +45,7 @@ export class GolComponent implements OnInit {
               newGenerationGrid = this.determineCellFate(newGenerationGrid, cell, numberOfNeigborAlive, i);
           }
           this.grid = JSON.parse(JSON.stringify(newGenerationGrid));
+          this.generationCount++;
       }, 100);
     }
   }
@@ -53,6 +55,7 @@ export class GolComponent implements OnInit {
   resetGrid(){
     this.stopSimulation();
     this.createGridArray();
+    this.generationCount = 0;
   }
 
 
