@@ -1,21 +1,28 @@
-// .canvas {
-//   width: 500px;
-//   height: 500px;
-// }
-.alive {
-  background-color: black;
-  transition: all 0.5s ease-in-out;
-}
-.dead {
-  background-color: white;
-  transition: all 0.5s ease-in-out;
-}
 #canvas-container {
-  // width: 1000px;
-  // height: 1000px;
   text-align: center;
 }
+.btn {
+  padding: 5px 10px;
+  margin: 0px 5px;
+  width: 100px;
+  font-weight: 600;
+  border-radius: 5px;
+  border: 1px solid;
+  color: #fff;
+}
+.icon {
+  width: 20px;
+  vertical-align: middle;
+  filter: invert(100%) sepia(0%) saturate(7428%) hue-rotate(138deg)
+    brightness(124%) contrast(115%);
+}
+.start-btn {
+  background-color: #048a81;
+}
+.stop-btn {
+  background-color: #ed6a5a;
+}
 
-canvas {
-  // display: inline;
+.reset-btn {
+  background-color: #3d52d5;
 }

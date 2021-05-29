@@ -1,7 +1,8 @@
 
-<div style="margin: 0 auto; text-align: center;">
-  <button (click)="startGame()">Start</button>
-  <button (click)="stopGame()">Stop</button>
+<div style="margin: 0 auto; text-align: center; padding: 15px 0px;">
+  <button class="start-btn btn" (click)="startSimulation()"><img src="./assets/imgs/play_arrow_black_24dp.svg" class="icon">Start</button>
+  <button class="stop-btn btn" (click)="stopSimulation()"><img src="./assets/imgs/stop_black_24dp.svg" class="icon">Stop</button>
+  <button class="reset-btn btn" (click)="resetGrid()"><img src="./assets/imgs/restart_alt_black_24dp.svg" class="icon">Reset</button>
 </div>
 <!-- <h1></h1>
 <div class="grid" [ngStyle]="setGridStyle()">
@@ -10,4 +11,4 @@
     </div>
   </div>
 </div> -->
-<div  id="canvas-container"><canvas #canvas width="1000" height="1000" (click)="getCord($event)"></canvas></div>
+<div  id="canvas-container"><canvas #canvas width="1000" height="1000"></canvas></div>

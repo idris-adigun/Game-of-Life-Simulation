@@ -11,40 +11,57 @@ export class GolComponent implements OnInit {
   ctx: CanvasRenderingContext2D;
   height= 1000;
   width= 1000;
-  resolution = 20;
+  resolution = 10;
   row = 0;
   column = 0;
   grid =[];
   cell = {};
   positions = ['TOP', 'TOP_RIGHT', 'RIGHT', 'BOTTOM_RIGHT', 'BOTTOM', 'LEFT_BOTTOM', 'LEFT', 'LEFT_TOP']
   timerInterval;
-
+  simulationRunningStatus = false;
   constructor() {
   }
-  getCord(event){
 
-    // let rect = this.ctx.canvas.getBoundingClientRect();
-    // let x = event.x / this.resolution;
-    // console.log(event.clientX )
-    // console.log(event)
+  ngOnInit(): void {
+    // this.ctx = this.canvas.nativeElement.getContext('2d');
+   this.row = this.width/this.resolution;
+   this.column = this.height/this.resolution;
+   this.ctx = this.canvas.nativeElement.getContext('2d');
+   this.createGridArray()
   }
 
-  drawLiveCell(x, y){
-    this.ctx.fillStyle = 'black';
-    this.ctx.fillRect(x, y, this.resolution - 1, this.resolution -1);
-    this.ctx.strokeRect(x, y, this.resolution, this.resolution);
-    this.ctx.strokeStyle = '#dadada';
+
+
+  startSimulation(){
+    if(!this.simulationRunningStatus){
+      this.timerInterval = setInterval(() => {
+          let newGenerationGrid = JSON.parse(JSON.stringify(this.grid));
+          this.simulationRunningStatus = true;
+          for(let i = 0; i < newGenerationGrid.length; i++)
+          {
+              let cell = this.grid[i];
+              let numberOfNeigborAlive = this.checkNeighborAlive(cell);
+              newGenerationGrid = this.determineCellFate(newGenerationGrid, cell, numberOfNeigborAlive, i);
+          }
+          this.grid = JSON.parse(JSON.stringify(newGenerationGrid));
+      }, 100);
+    }
   }
 
-  drawDeadCell(x, y){
-    this.ctx.fillStyle = 'white';
-    this.ctx.fillRect(x, y, this.resolution-1, this.resolution-1);
-    this.ctx.strokeRect(x, y, this.resolution, this.resolution);
-    this.ctx.strokeStyle = '#dadada';
+
+
+  resetGrid(){
+    this.stopSimulation();
+    this.createGridArray();
   }
 
-   createGrid(){
 
+  stopSimulation(){
+    this.simulationRunningStatus ? clearInterval(this.timerInterval) : '';
+    this.simulationRunningStatus = false;
+   }
+
+  createGridArray(){
     for(let i = 0; i < this.row; i++){
       for(let j = 0; j < this.column; j++)
       {
@@ -61,27 +78,21 @@ export class GolComponent implements OnInit {
           this.grid.push(cell);
       }
     }
-    this.startGame();
    }
 
-   ngOnInit(): void {
-     // this.ctx = this.canvas.nativeElement.getContext('2d');
-    this.row = this.width/this.resolution;
-    this.column = this.height/this.resolution;
-    this.ctx = this.canvas.nativeElement.getContext('2d');
-    this.createGrid()
-   }
+  drawLiveCell(x, y){
+    this.ctx.fillStyle = 'black';
+    this.ctx.fillRect(x, y, this.resolution - 1, this.resolution -1);
+    this.ctx.strokeRect(x, y, this.resolution, this.resolution);
+    this.ctx.strokeStyle = '#dadada';
+  }
 
-   setCanvasStyle(){
-     return{
-      //  'width': `${this.width}px`,
-      //  'height': `${this.height}px`
-     }
-   }
-
-   activateCell(cell){
-     this.grid[cell.index] = {...cell, alive: true}
-   }
+  drawDeadCell(x, y){
+    this.ctx.fillStyle = 'white';
+    this.ctx.fillRect(x, y, this.resolution-1, this.resolution-1);
+    this.ctx.strokeRect(x, y, this.resolution, this.resolution);
+    this.ctx.strokeStyle = '#dadada';
+  }
 
    determineCellFate(newGenerationGrid, cell, numberOfNeigborAlive, index){
 
@@ -103,30 +114,12 @@ export class GolComponent implements OnInit {
       }
     }
     else if(!newGenerationGrid[index].alive){
-      console.log('red')
       if(numberOfNeigborAlive === 3){
         newGenerationGrid[index].alive = true;
         this.drawLiveCell(x, y);
       }
     }
     return newGenerationGrid;
-   }
-
-   startGame(){
-    this.timerInterval = setInterval(() => {
-        let newGenerationGrid = JSON.parse(JSON.stringify(this.grid));
-        for(let i = 0; i < newGenerationGrid.length; i++)
-        {
-            let cell = this.grid[i];
-            let numberOfNeigborAlive = this.checkNeighborAlive(cell);
-            newGenerationGrid = this.determineCellFate(newGenerationGrid, cell, numberOfNeigborAlive, i);
-        }
-        this.grid = JSON.parse(JSON.stringify(newGenerationGrid));
-   }, 100);
-   }
-
-   stopGame(){
-    clearInterval(this.timerInterval);
    }
 
    checkNeighborAlive(cell){
@@ -149,6 +142,7 @@ export class GolComponent implements OnInit {
      return true;
    }
 
+  //  get close neighbor status
    getNeighbor(cell, position){
       let cordinates = this.getPositionCordinate(cell, position);
       let neighborStatus = {
@@ -161,6 +155,7 @@ export class GolComponent implements OnInit {
 
    }
 
+  //  get cordinate and index of neighboring cells
    getPositionCordinate(cell, position){
       let cord : any;
       position === 'TOP' ? cord = {x: cell.row -1, y: cell.col, index: cell.index - this.row} : '';
