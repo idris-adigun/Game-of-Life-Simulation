@@ -11,7 +11,7 @@ export class GolComponent implements OnInit {
   ctx: CanvasRenderingContext2D;
   height= 1000;
   width= 1000;
-  resolution = 10;
+  resolution = 100;
   row = 0;
   column = 0;
   grid =[];
@@ -50,7 +50,13 @@ export class GolComponent implements OnInit {
     }
   }
 
-
+  activateCell(e){
+    // console.log(e)
+    let x = Math.floor((e.x /this.resolution) -1 );
+    let y = Math.floor((e.y/this.resolution) -1);
+    // this.drawLiveCell(e.offsetX % this.height - 1 , e.offsetY % this.height -1);
+    console.log((e.offsetX % this.height), e.offsetY);
+  }
 
   resetGrid(){
     this.stopSimulation();
@@ -101,6 +107,7 @@ export class GolComponent implements OnInit {
    determineCellFate(newGenerationGrid, cell, numberOfNeigborAlive, index){
 
     let x = cell.row * this.resolution;
+    console.log(x)
     let y = cell.col * this.resolution;
     if(cell.alive){
       cell = newGenerationGrid[index]
